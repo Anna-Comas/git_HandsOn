@@ -13,7 +13,7 @@ parser = ArgumentParser(description = 'Classify a sequence as DNA or RNA')
 # Add required argument: the input sequence
 parser.add_argument("-s", "--seq", type = str, required = True, help = "Input sequence")
 
-# Add extra argument: a motif to search for in the sequence
+# Add extraargument: a motif to search for in the sequence
 parser.add_argument("-m", "--motif", type = str, required = False, help = "Motif")
 
 # If no arguments are provided, print the help message and exit
@@ -24,18 +24,21 @@ if len(sys.argv) == 1:
 # Parse the arguments from the command line
 args = parser.parse_args()
 
-# Convert the sequence to uppercase 
+# Convert the sequence to uppercase
 args.seq = args.seq.upper()
 
 # Check if the sequence contains only valid nucleotide characters (A, C, G, T, U)
 if re.search('^[ACGTU]+$', args.seq):
-    # If the sequence contains T, it is DNA
-    if re.search('T', args.seq):
+    # check for both T and U first to know if the sequence is not valid
+    if re.search('T', args.seq) and re.search('U', args.seq):
+        print('The sequence is not valid: contains both T and U')
+    # If the sequence contains T (and no U), it is DNA
+    elif re.search('T', args.seq):
         print('The sequence is DNA')
-    # If the sequence contains U, it is RNA
+    # If the sequence contains U (and no T), it is RNA
     elif re.search('U', args.seq):
         print('The sequence is RNA')
-    # If it contains neither T nor U, it could be either
+    # If it contains neither T nor U (only A, C, G), it could be either
     else:
         print('The sequence can be DNA or RNA')
 else:
@@ -49,6 +52,6 @@ if args.motif:
     print(f'Motif search enabled: looking for motif "{args.motif}" in sequence "{args.seq}"... ', end='')
     # Search for the motif in the sequence using regex
     if re.search(args.motif, args.seq):
-        print("FOUND in motif")
+        print(“A motif is FOUND on the sequence!”)
     else:
-        print("Motif NOT FOUND in the sequence!")
+        print(“A motif is NOT FOUND on the sequence!”)
